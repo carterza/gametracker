@@ -6,6 +6,7 @@
 create table game (
   id                        bigint not null,
   title                     varchar(255),
+  owned                     boolean,
   constraint pk_game primary key (id))
 ;
 
