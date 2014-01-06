@@ -1,0 +1,45 @@
+@(loginForm: Form[Application.Login])
+
+@import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapInput.render) }
+
+@main {
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="@routes.Application.index" class="navbar-brand" id="logo"><span>Game</span>Tracker</a>
+    </div>
+  </div>
+} {
+  @form(routes.Application.authenticate, 'class -> "form-signin", 'role -> "form") {
+    <h2 class="form-signin-heading">Please sign in</h2>
+     
+    @if(loginForm.hasGlobalErrors) { 
+        <p class="error">
+            @loginForm.globalError.message
+        </p>
+    }
+    
+    @if(flash.contains("success")) {
+        <p class="success">
+            @flash.get("success")
+        </p>
+    }
+    
+    <fieldset>
+      @inputText(loginForm("email"), 'class -> "form-control", 'placeholder -> "E-mail")
+      @inputPassword(loginForm("password"), 'class -> "form-control", 'placeholder -> "Password")
+    </fieldset>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    
+    <p class="note">
+      Try <em>user@@nerdery.com</em> with <em>secret</em> as password.
+    </p>
+  }
+}

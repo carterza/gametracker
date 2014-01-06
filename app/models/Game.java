@@ -12,9 +12,9 @@ public class Game extends Model {
 	@Id
 	public Long id;
 	public String title;
-	public Boolean owned;
+	public boolean owned = false;
 	
-	public Game(Long id, String title, Boolean owned) {
+	public Game(Long id, String title, boolean owned) {
 		this.id = id;
 		this.title = title;
 		this.owned = owned;
@@ -23,6 +23,12 @@ public class Game extends Model {
 	public static Finder<Long,Game> find = new Finder<Long,Game>(
 		Long.class, Game.class
 	);
+	
+	public static List<Game> findWanted() {
+		return find.where()
+			.eq("owned", false)
+			.findList();
+	}
 	
 	public static List<Game> findOwned() {
 		return find.where()

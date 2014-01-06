@@ -23,9 +23,19 @@ public class ModelsTest extends WithApplication {
 	}
 	
 	@Test
+	public void findWantedGame() {
+		new Game(2L, "Mass Effect 2", false).save();
+		new Game(3L, "Fallout 3", true).save();
+		List<Game> wantedGames = Game.findWanted();
+		assertNotNull(wantedGames);
+		assertEquals(1, wantedGames.size());
+		assertEquals("Mass Effect 2", wantedGames.get(0).title);
+	}
+	
+	@Test
 	public void findOwnedGame() {
-		new Game(1L, "GTAV", false).save();
-		new Game(2L, "Minecraft", true).save();
+		new Game(4L, "GTAV", false).save();
+		new Game(5L, "Minecraft", true).save();
 		List<Game> ownedGames = Game.findOwned();
 		assertNotNull(ownedGames);
 		assertEquals(1, ownedGames.size());

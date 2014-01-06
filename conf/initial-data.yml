@@ -1,0 +1,31 @@
+
+# Users
+users :
+
+- !!models.User
+    email:      user@nerdery.com
+    name:       User Name
+    password:   secret
+    
+# Games
+games:
+
+- !!models.Game
+    title:      Minecraft
+    owned:      false
+
+- !!models.Game
+    title:      Thief
+    owned:      false
+
+- !!models.Game
+    title:      GTAV
+    owned:      false
+
+- !!models.Game
+    title:      Halo 4
+    owned:      true
+
+- !!models.Game
+    title:      Battlefield 4
+    owned:      true
