@@ -1,0 +1,6 @@
+@(game: Game, votes: Integer)
+
+<li data-game-id="@game.id" class="list-group-item">
+    <span class="badge">@votes</span>
+    @game.title
+</li>

@@ -28,4 +28,28 @@
 			</div>
 		</div>
 	</nav>
+  
+  <section>
+    <div class ="container">
+      <div class="row">
+        <aside class="col-md-3 well">
+        </aside>
+        <article class="col-md-8 col-md-offset-1 well">
+            <h1>Wanted Games</h1>
+            @views.html.games.wantedGames(wantedGames)
+            <button id="newGame" class="btn btn-primary">Add Game</button>
+        </article>
+      </div>
+      <div class="row">
+        <article class="col-md-8 col-md-offset-4 well">
+            <h1>Purchased Games</h1>
+            <ul id="ownedGames" class="list-group">
+            @ownedGames.map { ownedGame =>
+                @views.html.games.ownedGame(ownedGame, ownedGame.votes.size())
+            }
+            </ul>
+        </article>
+      </div>
+    </div>
+  </section>
 }

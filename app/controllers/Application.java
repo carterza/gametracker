@@ -10,19 +10,19 @@ import views.html.*;
 
 public class Application extends Controller {
 
-		@Security.Authenticated(Secured.class)
-		public static Result index() {
+    @Security.Authenticated(Secured.class)
+    public static Result index() {
         return ok(dashboard.render( 
-            Game.findWanted(),
-            Game.findOwned(),
-						User.find.byId(request().username())
+            Game.findWantedByVotesDesc(),
+            Game.findOwnedByTitleAsc(),
+            User.findByEmail(request().username())
         )); 
     }
 
 
-		// -- Authentication
+    // -- Authentication
 
-		public static class Login {
+    public static class Login {
         
         public String email;
         public String password;
@@ -36,7 +36,7 @@ public class Application extends Controller {
         
     }
 		
-		/**
+    /**
      * Login page.
      */
     public static Result login() {
@@ -45,7 +45,7 @@ public class Application extends Controller {
         );
     }
 		
-		/**
+    /**
      * Handle login form submission.
      */
     public static Result authenticate() {
@@ -60,7 +60,7 @@ public class Application extends Controller {
         }
     }
 		
-		/**
+    /**
      * Logout and clean the session.
      */
     public static Result logout() {
@@ -68,6 +68,15 @@ public class Application extends Controller {
         flash("success", "You've been logged out");
         return redirect(
             routes.Application.login()
+        );
+    }
+		
+    public static Result javascriptRoutes() {
+        response().setContentType("text/javascript");
+        return ok(
+            Routes.javascriptRouter("jsRoutes",
+                controllers.routes.javascript.Games.add()
+            )
         );
     }
 }

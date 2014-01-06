@@ -16,7 +16,9 @@ public class User extends Model {
 
     private static final long serialVersionUID = 1L;
 
-		@Id
+	@Id
+    public Long id;
+    
     @Constraints.Required
     @Formats.NonEmpty
     public String email;
@@ -29,7 +31,7 @@ public class User extends Model {
     
     // -- Queries
     
-    public static Model.Finder<String,User> find = new Model.Finder<String,User>(String.class, User.class);
+    public static Model.Finder<Long,User> find = new Model.Finder<Long,User>(Long.class, User.class);
     
     /**
      * Retrieve all users.

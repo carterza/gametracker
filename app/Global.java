@@ -27,6 +27,8 @@ public class Global extends GlobalSettings {
                 // Insert tasks
                 Ebean.save(all.get("games"));
                 
+                // Insert votes
+                Ebean.save(all.get("votes"));
             }
         }
         

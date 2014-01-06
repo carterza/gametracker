@@ -1,0 +1,7 @@
+@(games: List[Game])
+
+<ul id="wantedGames" class="list-group">
+    @games.map { game =>
+        @views.html.games.wantedgame(game, game.votes.size())
+    }
+</ul>
