@@ -1,0 +1,48 @@
+@(message: String, games: List[Game])
+
+@main("GameTracker") {
+    
+        <!-- Game App Interface -->
+        <div id="gameapp">
+                
+                <div class="title">
+                  <h1>Games we want</h1>
+                </div>
+
+                  <div class="content">
+
+                    <div id="create-game">
+                      <input id="new-game" placeholder="What game should we buy?" type="text">
+                      <span class="ui-tooltip-top" style="display:none;">Press Enter to save this game</span>
+                    </div>
+
+                    <div id="wanted-games">
+                      <ul id="wanted-game-list"></ul>            
+                    </div>
+                </div>
+                
+                <div class="title">
+                  <h1>Games we own</h1>
+                </div>
+
+                <div class="content">
+                  <div id="owned-games">
+                    <ul id="owned-game-list"></ul>            
+                  </div>
+                </div>
+        </div>
+
+        <!-- Templates -->
+
+        <script type="text/template" id="item-template">
+          <div class="game <%= owned ? 'owned' : '' %>">
+            <div class="display">
+              <input class="check" type="checkbox" <%= owned ? 'checked="checked"' : '' %> />
+              <div class="game-text"></div>
+            </div>
+            <div class="edit">
+              <input class="game-input" type="text" value="" />
+            </div>
+          </div>
+        </script>
+}

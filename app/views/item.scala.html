@@ -1,0 +1,11 @@
+@(game: Game)
+
+<div class="game @if(game.owned) {owned}">
+        <div class="display">
+            <input class="check" type="checkbox" @if(game.owned) {checked="checked"} />
+              <div class="game-text"></div>
+    </div>
+    <div class="edit">
+              <input class="game-input" type="text" value="" />
+    </div>
+</div>

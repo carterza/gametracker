@@ -2,9 +2,10 @@ package models;
 
 import java.util.*;
 
-import javax.persistence.*;
+import play.data.validation.Constraints.*;
+
 import play.db.ebean.*;
-import com.avaje.ebean.*;
+import javax.persistence.*;
 
 /**
  * Game entity managed by Ebean
@@ -17,52 +18,57 @@ public class Game extends Model {
     @Id
     public Long id;
     
+    @Required
     public String title;
     
-    public boolean owned = false;
+    @Required
+    public boolean owned;
     
-    @OneToMany(cascade=CascadeType.ALL)
-    public List<Vote> votes;
-    
-    public Game(String title, boolean owned) {
-        this.title = title;
-        this.owned = owned;
-        this.votes = new ArrayList<Vote>();
-    }
+    @OneToMany(cascade=CascadeType.ALL)  
+    public List<Vote> votes;      
     
     public static Finder<Long,Game> find = new Finder<Long,Game>(Long.class, Game.class);
     
-    public static List<Game> findWantedByVotesDesc() {
+    public static List<Game> all() {
+        return find.all();
+    }
+    
+    public static List<Game> wanted() {
+        return find.fetch("votes")
+            .where()
+            .eq("owned", false)
+            .findList();
+    }
+    
+    public static List<Game> wantedByVotesDesc() {
         List<Game> wantedGames = find.fetch("votes")
             .where()
             .eq("owned", false)
             .findList();
+            
         Collections.sort(wantedGames, Collections.reverseOrder(new Game.VoteCountComparator()));
         return wantedGames;
     }
     
-    public static List<Game> findOwnedByTitleAsc() {
+    public static List<Game> owned() {
         return find.where()
-                .eq("owned", true)
-                .orderBy("title asc")
-                .findList();
+            .eq("owned", true)
+            .findList();
     }
     
-    /**
-    * Create a new game
-    */
-    public static Game create(String title, boolean owned, String creator) {
-        Game game = new Game(title, owned);
-        game.votes.add(new Vote(game, User.findByEmail(creator)));
+    public static Game create(Game game) {
         game.save();
         return game;
     }
-        
-    public String toString() {
-        return "Game(" + id + ")";
+    
+    public static void update(Long id, String title, boolean owned) {
+        Game game = Game.find.ref(id);
+        game.title = title;
+        game.owned = owned;
+        game.update();
     }
     
-    static class VoteCountComparator implements Comparator<Game> {
+   static class VoteCountComparator implements Comparator<Game> {
         public int compare(Game g1, Game g2) {
             int numVotes1 = g1.votes.size(),
                 numVotes2 = g2.votes.size();

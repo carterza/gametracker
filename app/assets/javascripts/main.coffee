@@ -1,33 +1,100 @@
-# -----------------------------------------------
-# MAIN
-# -----------------------------------------------
-# DISCLAMER :
-# If you're used to Backbone.js, you may be
-# confused by the absence of models, but the goal
-# of this sample is to demonstrate some features
-# of Play including the template engine.
-# I'm not using client-side templating nor models
-# for this purpose, and I do not recommend this
-# behavior for real life projects.
-# -----------------------------------------------
-
-class Games extends Backbone.View
-    initialize: ->
-        $("#newGame").click @addGame
-    addGame: (e) ->
-        r = jsRoutes.controllers.Games.add()
-        $.ajax
-            url: r.url
-            type: r.type
-            context: this
-            success: (data) ->
-                _view = new Game
-                    el: $("#wantedGames").html(data)
-            error: (err) ->
-                $.error("Error: " + err)
-                
-class Game extends Backbone.View
-
 $ ->
-
-    games = new Games el : $("#wantedGames")
+  class window.Game extends Backbone.Model
+    defaults: ->
+      id: null
+      title: ''
+      owned: false
+      votes: []
+    initialize: =>
+      @set({"title": @defaults.title}) if not @get("title")
+    markAsOwned: =>
+      @save({owned: true},{success: -> alert 'Success!', error: -> alert 'Error', wait: true})
+      
+  class window.Vote extends Backbone.Model
+    defaults: ->
+      id: null
+      
+  class window.WantedGameList extends Backbone.Collection
+    model: Game
+    url: jsRoutes.controllers.Application.games().url
+      
+  class window.OwnedGameList extends Backbone.Collection
+    model: Game
+    url: jsRoutes.controllers.Application.ownedGames().url
+      
+  class window.GameView extends Backbone.View
+    tagname: 'li'
+    template: _.template($('#item-template').html())
+    events:
+      'click .check': 'markAsOwned'
+    initialize: =>
+      @model.bind('change', @render, @)
+    render: =>
+      $(@el).html(@template(@model.toJSON()))
+      @setText()
+      @
+    setText: =>
+      text = @model.get('title')
+      @$('.game-text').text(text)
+      @input = @$('.game-input')
+      @input.bind('blur', _.bind(@close, @)).val(text)
+    markAsOwned: =>
+      @model.markAsOwned()
+    edit: =>
+      $(@el).addClass 'editing'
+      @input.focus
+    close: =>
+      @model.save {title: @input.val}
+      $(@el).removeClass 'editing'
+    updateOnEnter: (e) ->
+      @close if e.keyCode is 13
+      
+  class window.AppView extends Backbone.View
+    el: $('#gameapp')
+    events:
+      'keypress #new-game': 'createOnEnter'
+      'keyup #new-game': 'showTooltip'
+    initialize: =>
+      @input = @$('#new-game')
+      WantedGames.bind('add', @addOneWanted, @)
+      OwnedGames.bind('add', @addOneOwned, @)
+      WantedGames.fetch()
+      OwnedGames.fetch()
+    addOneWanted: (game) ->
+      view = new GameView({model: game})
+      console.log(game)
+      $('#wanted-game-list').append(view.render().el)
+    addOneOwned: (game) ->
+      view = new GameView({model: game})
+      $('#owned-game-list').append(view.render().el)
+    createOnEnter: (e) =>
+      text = @input.val()
+      return if not text or e.keyCode isnt 13
+      
+      jsRoutes.controllers.Application.add().ajax
+        type: 'POST'
+        context: this
+        data:
+          title: text
+          owned: false
+        success: (tpl) ->
+          newGame = new Game(tpl)
+          WantedGames.add(newGame)
+        err: (err) ->
+          alert "Something went wrong:" + err
+          
+      @input.val('')
+      false
+    showTooltip: (e) =>
+      tooltip = @$('.ui-tooltip-top')
+      val = @input.val()
+      tooltip.fadeOut()
+      clearTimeout(@tooltipTimeout) if @tooltipTimeout
+      return if val is '' or val is @input.attr('placeholder')
+      show = -> tooltip.show().fadeIn()
+      @tooltipTimeout = _.delay(show, 1000)
+      
+  window.WantedGames = new WantedGameList
+  window.OwnedGames = new OwnedGameList
+  window.App = new AppView
+  

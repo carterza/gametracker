@@ -1,9 +1,0 @@
-@(game: Game, votes: Integer)
-
-<li data-game-id="@game.id" class="list-group-item wantedGame">
-	<span class="badge">@votes</span>
-	<button type="button" class="btn btn-default btn-xs pull-right vote">
-		<span class="glyphicon glyphicon-thumbs-up"></span> Vote
-	</button>
-    @game.title
-</li>

@@ -1,39 +1,31 @@
 
-# Users
-users:
-
-- !!models.User
-    email:      user@nerdery.com
-    name:       User Name
-    password:   secret
-    
 # Games
 games:
 
 - !!models.Game
+    id:         1
     title:      Minecraft
     owned:      false
+    votes:
+      - !!models.Vote
+        id:     1
 
 - !!models.Game
+    id:         2
     title:      Thief
     owned:      false
+    votes:
+      - !!models.Vote
+        id:     2
+      - !!models.Vote
+        id:     3
 
 - !!models.Game
+    id:         3
     title:      Halo 4
     owned:      true
 
 - !!models.Game
+    id:         4
     title:      Battlefield 4
     owned:      true
-    
-# Votes
-votes:
-- !!models.Vote
-    voter:      !!models.User
-                    email:      carterza@gmail.com
-                    name:       Zachary Carter
-                    password:   secret
-    game:       !!models.Game
-                    title:      GTAV
-                    owned:      false
-    

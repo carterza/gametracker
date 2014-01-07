@@ -3,18 +3,16 @@
 # ~~~~
 
 # Home page
-GET     /                                   controllers.Application.index()
-
-# Authentication
-GET		/login						        controllers.Application.login()
-POST    /login                              controllers.Application.authenticate()
-GET     /logout                             controllers.Application.logout()
+GET     /                           controllers.Application.index()
 
 # Games
-POST    /games                              controllers.Games.add()
+GET     /games                    controllers.Application.games()
+GET     /games/owned              controllers.Application.ownedGames()
+POST    /games                  	controllers.Application.add()
+PUT		/games/:game				controllers.Application.update(game: Long)
 
 # Javascript routing
-GET     /assets/javascripts/routes          controllers.Application.javascriptRoutes()
+GET     /assets/javascripts/routes	controllers.Application.javascriptRoutes()
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                       controllers.Assets.at(path="/public", file)
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
