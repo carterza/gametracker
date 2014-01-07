@@ -1,10 +1,15 @@
 package controllers;
 
+import static play.data.Form.*;
+
 import play.*;
 import play.mvc.*;
 import play.data.*;
-import static play.data.Form.*;
+
 import play.libs.Json;
+import play.libs.Json.*;                        
+import static play.libs.Json.toJson;    
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import models.Game;
 
@@ -26,7 +31,9 @@ public class Application extends Controller {
 	
 	public static Result update(Long id) {
 		Game.update(id, form().bindFromRequest().get("title"), Boolean.valueOf(form().bindFromRequest().get("owned")));
-		return ok();
+		ObjectNode result = Json.newObject();
+		result.put("status", "OK");
+		return ok(result);
 	}
 	
 	public static Result add() {

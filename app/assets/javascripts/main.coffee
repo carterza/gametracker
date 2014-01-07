@@ -8,7 +8,7 @@ $ ->
     initialize: =>
       @set({"title": @defaults.title}) if not @get("title")
     markAsOwned: =>
-      @save({owned: true},{success: -> alert 'Success!', error: -> alert 'Error', wait: true})
+      @save({owned: true})
       
   class window.Vote extends Backbone.Model
     defaults: ->
@@ -30,9 +30,18 @@ $ ->
     initialize: =>
       @model.bind('change', @render, @)
     render: =>
+      if 'owned' of @model.changed
+        @updateCollections()
       $(@el).html(@template(@model.toJSON()))
       @setText()
       @
+    updateCollections: =>
+      if @model.get 'owned'
+        WantedGames.remove @model
+        OwnedGames.add @model
+      else
+        OwnedGames.remove @model
+        WantedGames.add @model
     setText: =>
       text = @model.get('title')
       @$('.game-text').text(text)
@@ -51,6 +60,7 @@ $ ->
       
   class window.AppView extends Backbone.View
     el: $('#gameapp')
+    collection: window.WantedGames
     events:
       'keypress #new-game': 'createOnEnter'
       'keyup #new-game': 'showTooltip'
