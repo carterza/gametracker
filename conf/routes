@@ -6,10 +6,14 @@
 GET     /                           controllers.Application.index()
 
 # Games
-GET     /games                    controllers.Application.games()
-GET     /games/owned              controllers.Application.ownedGames()
-POST    /games                  	controllers.Application.add()
-PUT		/games/:game				controllers.Application.update(game: Long)
+GET     /games                      controllers.Application.games()
+GET     /games/owned                controllers.Application.ownedGames()
+POST    /games                  	  controllers.Application.add()
+PUT		  /games/:game				        controllers.Application.update(game: Long)
+
+# Votes
+GET     /votes                      controllers.Application.votes()
+POST    /votes                      controllers.Application.addVote()
 
 # Javascript routing
 GET     /assets/javascripts/routes	controllers.Application.javascriptRoutes()

@@ -23,4 +23,9 @@ public class Vote extends Model {
     public static List<Vote> all() {
         return find.all();
     }
+    
+    public static Vote create(Vote vote) {
+        vote.save();
+        return vote;
+    }
 }

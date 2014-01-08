@@ -25,7 +25,7 @@ public class Game extends Model {
     public boolean owned;
     
     @OneToMany(cascade=CascadeType.ALL)  
-    public List<Vote> votes;      
+    public List<Vote> votes;
     
     public static Finder<Long,Game> find = new Finder<Long,Game>(Long.class, Game.class);
     

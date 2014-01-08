@@ -8,10 +8,20 @@ $ ->
     
     initialize: ->
       if !@get('title')
-          @set({'title': @defaults.title})
+        @set({'title': @defaults.title})
           
     markOwned: ->
       @save({owned: true})
+	  
+    addVote: ->
+      vote = new Vote
+      @get('votes').push vote
+      @save({votes: @get('votes')})
+	  
+  class Vote extends Backbone.Model
+    defaults:
+      id: null
+    url: jsRoutes.controllers.Application.votes().url
       
   class WantedGamesList extends Backbone.Collection
     model: Game
@@ -59,7 +69,7 @@ $ ->
       @model.markOwned()
       
     vote: ->
-      
+      @model.addVote()
   
   class AppView extends Backbone.View
     el: $('#gameapp')
