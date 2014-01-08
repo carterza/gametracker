@@ -53,6 +53,7 @@ public class Game extends Model {
     public static List<Game> owned() {
         return find.where()
             .eq("owned", true)
+            .orderBy("title asc")
             .findList();
     }
     

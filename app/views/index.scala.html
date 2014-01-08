@@ -33,16 +33,14 @@
         </div>
 
         <!-- Templates -->
-
         <script type="text/template" id="item-template">
           <div class="game <%= owned ? 'owned' : '' %>">
             <div class="display">
-              <input class="check" type="checkbox" <%= owned ? 'checked="checked"' : '' %> />
+              <%= owned ? '' : '<input class="check" type="checkbox" />' %>
               <div class="game-text"></div>
+              <%= owned ? '' : '<div class="votes"><span>Votes :' + _.size(votes) + '</span></div>' %>
             </div>
-            <div class="edit">
-              <input class="game-input" type="text" value="" />
-            </div>
+            <span class="game-title" />
           </div>
         </script>
 }
