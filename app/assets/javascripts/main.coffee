@@ -29,6 +29,7 @@ $ ->
     
     events:
       'click .check'          : 'markOwned'
+      'click  .vote'          : 'vote'
     
     initialize: ->
       @model.bind('change', @render, @)
@@ -56,6 +57,9 @@ $ ->
       
     markOwned: ->
       @model.markOwned()
+      
+    vote: ->
+      
   
   class AppView extends Backbone.View
     el: $('#gameapp')
@@ -66,8 +70,6 @@ $ ->
       
     initialize: =>
       @input = @$('#new-game')
-      
-      @template = _.template($('#item-template').html())
       
       WantedGames.bind('add', @addOneWanted, @)
       WantedGames.bind('reset', @addAllWanted, @)
