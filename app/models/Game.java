@@ -30,6 +30,7 @@ public class Game extends Model {
     public Game(String title) {
         this.title = title;
         this.owned = false;
+        this.votes = new ArrayList<Vote>();
     }
     
     public static Finder<Long,Game> find = new Finder<Long,Game>(Long.class, Game.class);
@@ -39,12 +40,6 @@ public class Game extends Model {
     }
     
     public static List<Game> wanted() {
-        return find.where()
-            .eq("owned", false)
-            .findList();
-    }
-    
-    public static List<Game> wantedByVotesDesc() {
         List<Game> wantedGames = find.where()
             .eq("owned", false)
             .findList();
@@ -75,8 +70,8 @@ public class Game extends Model {
     
     static class VoteCountComparator implements Comparator<Game> {
         public int compare(Game g1, Game g2) {
-            int numVotes1 = Vote.findByGame(g1.id).size(),
-                numVotes2 = Vote.findByGame(g2.id).size();
+            int numVotes1 = g1.votes.size(),
+                numVotes2 = g2.votes.size();
             
             return (numVotes1 == numVotes2) ? 0
                 : (numVotes1 > numVotes2) ? 1

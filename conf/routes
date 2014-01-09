@@ -6,11 +6,12 @@
 GET     /                           controllers.Application.index()
 
 # Games
-GET     /game                       controllers.Games.index()
-POST    /game                       controllers.Games.add()
+GET     /games                      controllers.Games.show(owned:Boolean ?=false)
+GET     /games/manage               controllers.Games.manage()
+POST    /games                      controllers.Games.add()
 
 # Votes
-POST    /vote                       controllers.Votes.add()
+POST    /votes                       controllers.Votes.add()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

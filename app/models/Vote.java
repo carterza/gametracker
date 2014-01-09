@@ -7,6 +7,8 @@ import play.data.validation.Constraints.*;
 import play.db.ebean.*;
 import javax.persistence.*;
 
+import models.Game;
+
 /**
  * Vote entity managed by Ebean
  */
@@ -24,14 +26,11 @@ public class Vote extends Model {
         return find.all();
     }
     
-    public static List<Vote> findByGame(Long game) {
-        return find.where()
-            .eq("game.id", game)
-            .findList();
-    }
-    
-    public static Vote create(Vote vote, Long game) {
-        vote.save();
+    public static Vote create(Long gameId) {
+        Vote vote = new Vote();        
+        Game game = Game.find.ref(gameId);
+        game.votes.add(vote);
+        game.save();
         return vote;
     }
 }

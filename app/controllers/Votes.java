@@ -19,12 +19,14 @@ public class Votes extends Controller {
     }
     
     public static Result add() {
+        Vote newVote = Vote.create(Long.parseLong(form().bindFromRequest().get("game")));
+        return ok(Json.toJson(newVote));
         // Form<Vote> voteForm = form(Vote.class).bindFromRequest();
         // if(voteForm.hasErrors()) {
             // return badRequest();
         // } else {
             // return ok(Json.toJson(Vote.create(voteForm.get(), game)));
         // }
-        return ok();
+        // return ok();
     }
 }

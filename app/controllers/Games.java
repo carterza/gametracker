@@ -13,16 +13,11 @@ import models.*;
 
 public class Games extends Controller {
     
-    public static Result index() {
-        // if(owned)
-            // return ok(Json.toJson(Game.owned()));
-        // else
-            // return ok(Json.toJson(Game.wantedByVotesDesc()));
-        Form<Game> gameForm = form(Game.class).bindFromRequest();
-        // if(gameForm.get("id"))
-            // return ok(Json.toJson(Game.find(gameForm.get("id")))
-        // else
-            return ok(Json.toJson(Game.all()));
+    public static Result show(Boolean owned) {
+        if(owned)
+            return ok(Json.toJson(Game.owned()));
+        else
+            return ok(Json.toJson(Game.wanted()));
     }
     
     public static Result add() {

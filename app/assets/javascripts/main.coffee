@@ -1,11 +1,11 @@
 $ ->
 
   class window.Vote extends Backbone.RelationalModel
-    urlRoot: '/vote'
+    urlRoot: '/votes'
     idAttribute: Backbone.Model.prototype.idAttribute
 
   class window.Game extends Backbone.RelationalModel
-    urlRoot: '/game'
+    urlRoot: '/games'
     idAttribute: Backbone.Model.prototype.idAttribute
     relations: [
       type: Backbone.HasMany
@@ -18,8 +18,16 @@ $ ->
     ]
 
   class window.GameCollection extends Backbone.Collection
-    url: '/game'
+    url: '/games'
     model: window.Game
+    initialize: ->
+      @bind 'sync', @bindModelEvents, @
+    bindModelEvents: =>
+      @bindVoteAddedEvent game for game in @models
+    bindVoteAddedEvent: (game) ->
+      game.bind 'add:votes', @onVoteAdded, @
+    onVoteAdded: =>
+      @sort()
     
   class window.GameListView extends Backbone.View
     tagName: 'div'
@@ -39,10 +47,10 @@ $ ->
       
     renderGame: (game) =>
       game_view = new window.GameView {model: game}
-      @$('ul.game_list').prepend($(game_view.render()))
+      @$('ul.game_list').append($(game_view.render()))
       
     events:
-      'click input[type=submit]': 'onSubmit'
+      'click .new_game_submit': 'onSubmit'
       
     onSubmit: (e) =>
       game = new window.Game {title: @$('.new_game_title').val()}
@@ -64,21 +72,39 @@ $ ->
     
     initialize: ->
       @model.bind 'all', @render, @
+      @model.bind 'change', @sortCollection, @
       
     template: Handlebars.compile($('#tpl_game').html())
     
     render: =>
       $(@el).html(@template(@model.toJSON()))
       
+    sortCollection: =>
+      alert 'Sort!'
+      
+    events:
+      'click .new_vote_submit': 'onSubmit'
+      
+    onSubmit: (e) =>
+      vote = new window.Vote {game: @model}
+      vote.save()
+      
   class window.Router extends Backbone.Router
     routes:
-      '': 'showGameList'
+      '': 'showGameLists'
     
-    showGameList: ->
-      game_collection = new window.GameCollection
-      game_list_view = new window.GameListView {el: $('#content'), model: game_collection}
+    showGameLists: ->
+      wanted_game_collection = new window.GameCollection
+      wanted_game_collection.comparator = (game) ->
+        -game.get('votes').length
+      wanted_game_list_view = new window.GameListView {el: $('#wanted_games'), model: wanted_game_collection}
+      wanted_game_collection.fetch {data: {owned: false}}
       
-      game_collection.fetch()
+      owned_game_collection = new window.GameCollection
+      owned_game_collection.comparator = (game) ->
+        game.get('title')
+      owned_game_list_view = new window.GameListView {el: $('#owned_games'), model: owned_game_collection}
+      owned_game_collection.fetch {data: {owned: true}}       
       
   window.App = null
   window.App = new Router
