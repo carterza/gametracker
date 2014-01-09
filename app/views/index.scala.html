@@ -1,46 +1,23 @@
-@(message: String, games: List[Game])
-
 @main("GameTracker") {
-    
-        <!-- Game App Interface -->
-        <div id="gameapp">
-                
-                <div class="title">
-                  <h1>Games we want</h1>
-                </div>
+  <div class="main">
+    <div id="content"></div>
+  </div>
+  
+  <script type="text/template" id="tpl_game_list">
+      <h2 class="centered">Games</h2>
+              
+      <ul class="game_list"></ul>
 
-                  <div class="content">
-
-                    <div id="create-game">
-                      <input id="new-game" placeholder="What game should we buy?" type="text">
-                      <span class="ui-tooltip-top" style="display:none;">Press Enter to save this game</span>
-                    </div>
-
-                    <div id="wanted-games">
-                      <ul id="wanted-game-list"></ul>            
-                    </div>
-                </div>
-                
-                <div class="title">
-                  <h1>Games we own</h1>
-                </div>
-
-                <div class="content">
-                  <div id="owned-games">
-                    <ul id="owned-game-list"></ul>            
-                  </div>
-                </div>
-        </div>
-
-        <!-- Templates -->
-        <script type="text/template" id="item-template">
-          <div class="game <%= owned ? 'owned' : '' %>">
-            <div class="display">
-              <%= owned ? '' : '<input class="check" type="checkbox" />' %>
-              <div class="game-text"></div>
-              <%= owned ? '' : '<div class="votes"><span>Votes : ' + _.size(votes) + '</span><button class="vote">Vote for this game</button></div>' %>
-            </div>
-            <span class="game-title" />
-          </div>
-        </script>
+      <h2>New Game</h2>
+      <ul>
+          <li>Title: <input type="text" class="new_game_title" /></li>
+          <li><input type="submit" class="new_game_submit" value="Create game" /></li>
+      </ul>
+      <div class="error_message"></div>
+  </script>
+  
+  <script type="text/template" id="tpl_game">
+      <span class="thread_title">{{title}}</span> 
+      <span class="thread_nb_votes">{{votes.length}} votes</span>
+  </script>
 }

@@ -1,27 +1,25 @@
 
 # Games
 games:
-
-- !!models.Game
+  - !!models.Game
     title:      Minecraft
-    owned:      false
-    votes:
-      - !!models.Vote
-        id: 3
-
-- !!models.Game
-    title:      Thief
     owned:      false
     votes:
       - !!models.Vote
         id: 1
       - !!models.Vote
         id: 2
+  - !!models.Game
+    title:      Thief
+    owned:      false
+    votes:
+      - !!models.Vote
+        id: 3
 
-- !!models.Game
+  - !!models.Game
     title:      Halo 4
     owned:      true
 
-- !!models.Game
+  - !!models.Game
     title:      Battlefield 4
     owned:      true

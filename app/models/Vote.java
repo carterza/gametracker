@@ -16,7 +16,7 @@ public class Vote extends Model {
     private static final long serialVersionUID = 1L;
     
     @Id
-    public Long id;    
+    public Long id;
     
     public static Finder<Long,Vote> find = new Finder<Long,Vote>(Long.class, Vote.class);
     
@@ -24,7 +24,13 @@ public class Vote extends Model {
         return find.all();
     }
     
-    public static Vote create(Vote vote) {
+    public static List<Vote> findByGame(Long game) {
+        return find.where()
+            .eq("game.id", game)
+            .findList();
+    }
+    
+    public static Vote create(Vote vote, Long game) {
         vote.save();
         return vote;
     }

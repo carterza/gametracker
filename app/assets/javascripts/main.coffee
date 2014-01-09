@@ -1,149 +1,85 @@
 $ ->
-  class Game extends Backbone.Model
-    defaults:
-      id: null
-      title: ''
-      owned: false
-      votes: []
+
+  class window.Vote extends Backbone.RelationalModel
+    urlRoot: '/vote'
+    idAttribute: Backbone.Model.prototype.idAttribute
+
+  class window.Game extends Backbone.RelationalModel
+    urlRoot: '/game'
+    idAttribute: Backbone.Model.prototype.idAttribute
+    relations: [
+      type: Backbone.HasMany
+      key: 'votes'
+      relatedModel: 'window.Vote'
+      reverseRelation: {
+        key: 'game'
+        includeInJSON: Backbone.Model.prototype.idAttribute
+      }
+    ]
+
+  class window.GameCollection extends Backbone.Collection
+    url: '/game'
+    model: window.Game
+    
+  class window.GameListView extends Backbone.View
+    tagName: 'div'
+    
+    className: 'game_list_view'
     
     initialize: ->
-      if !@get('title')
-        @set({'title': @defaults.title})
-          
-    markOwned: ->
-      @save({owned: true})
-	  
-    addVote: ->
-      vote = new Vote
-      @get('votes').push vote
-      @save({votes: @get('votes')})
-	  
-  class Vote extends Backbone.Model
-    defaults:
-      id: null
-    url: jsRoutes.controllers.Application.votes().url
+      @model.bind 'all', @render, @
+      @model.bind 'add', @renderGame, @
       
-  class WantedGamesList extends Backbone.Collection
-    model: Game
-    url: jsRoutes.controllers.Application.games().url
+    template: Handlebars.compile($('#tpl_game_list').html())
     
-  class OwnedGamesList extends Backbone.Collection
-    model: Game
-    comparator: 'title'
-    url: jsRoutes.controllers.Application.ownedGames().url
-    
-  class GameView extends Backbone.View
+    render: =>
+      $(@el).html(@template())
+      @renderGame game for game in @model.models
+      $(@el).html()
+      
+    renderGame: (game) =>
+      game_view = new window.GameView {model: game}
+      @$('ul.game_list').prepend($(game_view.render()))
+      
+    events:
+      'click input[type=submit]': 'onSubmit'
+      
+    onSubmit: (e) =>
+      game = new window.Game {title: @$('.new_game_title').val()}
+      game.save {}, {success: @onGameCreated, error: @onError}
+      
+    onGameCreated: (game, response) =>
+      @model.add game, {at: 0}
+      vote = new window.Vote {game: game.get('id')}
+      vote.save {}, {error: @onError}
+      
+    onError: (model, response) =>
+      error = $.parseJSON(response.responseText)
+      @$('.error-message').html(error.message)
+
+  class window.GameView extends Backbone.View
     tagName: 'li'
     
-    template: _.template($('#item-template').html())
-    
-    events:
-      'click .check'          : 'markOwned'
-      'click  .vote'          : 'vote'
+    className: 'game_view'
     
     initialize: ->
-      @model.bind('change', @render, @)
-      @model.bind('remove', @remove, @)
-      @model.bind('sync', @updateCollection, @)
+      @model.bind 'all', @render, @
       
+    template: Handlebars.compile($('#tpl_game').html())
+    
     render: =>
       $(@el).html(@template(@model.toJSON()))
-      @setTitle()
-      return this
       
-    remove: =>
-      $(@el).remove()
-      
-    updateCollection: (model, resp, options) =>
-      if @model.get('owned') and @model.collection instanceof WantedGamesList
-        WantedGames.remove @model
-        OwnedGames.add @model
-        
-    setTitle: ->
-      title = @model.get('title')
-      @$('game-text').text(title)
-      @titleSpan = @$('.game-title')
-      @titleSpan.html(title)
-      
-    markOwned: ->
-      @model.markOwned()
-      
-    vote: ->
-      @model.addVote()
-  
-  class AppView extends Backbone.View
-    el: $('#gameapp')
+  class window.Router extends Backbone.Router
+    routes:
+      '': 'showGameList'
     
-    events:
-      'keypress #new-game'  : 'createOnEnter',
-      'keyup #new-game'     : 'showTooltip'
+    showGameList: ->
+      game_collection = new window.GameCollection
+      game_list_view = new window.GameListView {el: $('#content'), model: game_collection}
       
-    initialize: =>
-      @input = @$('#new-game')
+      game_collection.fetch()
       
-      WantedGames.bind('add', @addOneWanted, @)
-      WantedGames.bind('reset', @addAllWanted, @)
-      WantedGames.bind('all', @renderWanted, @)
-      
-      OwnedGames.bind('add', @addOneOwned, @)
-      OwnedGames.bind('reset', @addAllOwned, @)
-      OwnedGames.bind('all', @renderOwned, @)
-      
-      WantedGames.fetch()
-      OwnedGames.fetch()
-      
-    renderWanted: =>
-      @$('#wanted-games').empty()
-      for game in WantedGames.models
-        do (game) =>
-          view = new GameView({model: game})
-          @$('#wanted-games').append(view.render().el)
-          
-    renderOwned: =>
-      @$('#owned-games').empty()
-      for game in OwnedGames.models
-        do (game) =>
-          view = new GameView({model: game})
-          @$('#owned-games').append(view.render().el)
-    
-    addOneWanted: (game) =>
-      view = new GameView({model: game})
-      @$('#wanted-games').append(view.render().el)
-      
-    addAllWanted: =>
-      WantedGames.each(@addOneWanted)
-      
-    addOneOwned: (game) =>
-      view = new GameView({model: game})
-      @$('#owned-games').append(view.render().el)
-      
-    addAllOwned: =>
-      OwnedGames.each(@addOneOwned)
-      
-    newAttributes: ->
-      return {
-        title: @input.val(),
-        owned: false,
-        votes: []
-      }
-      
-    createOnEnter: (e) ->
-      return if (e.keyCode != 13)
-      WantedGames.create(@newAttributes())
-      @input.val('')
-      
-    showTooltip: (e) ->
-      tooltip = this.$('.ui-tooltip-top')
-      val = @input.val()
-      tooltip.fadeOut()
-      clearTimeout(@tooltipTimeout) if (@tooltipTimeout)
-      return if (val is '' || val is @input.attr('placeholder'))
-      
-      show = () ->
-        tooltip.show().fadeIn()
-      @tooltipTimeout = _.delay(show, 1000)
-
-  WantedGames = new WantedGamesList()
-  OwnedGames = new OwnedGamesList()
-  App = new AppView()
-    
+  window.App = null
+  window.App = new Router
+  Backbone.history.start {pushState: true}

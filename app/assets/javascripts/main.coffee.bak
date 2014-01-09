@@ -1,0 +1,159 @@
+$ ->
+
+  class Game extends BackboneRelational.Model
+    defaults:
+      id: null
+      title: ''
+      owned: false
+      votes: []
+			
+    initialize: ->
+      if !@get 'title'
+        @set {'title': @defaults.title}
+        
+    relations:
+      type: Backbone.HasMany
+      key: 'votes'
+      relatedModel: 'Vote'
+      collectionType: 'Votes'
+    
+    idAttribute: 'id'
+    urlRoot: '/games'
+
+  class Vote extends Backbone.RelationalModel
+    defaults:
+      id: null
+      game: null
+      
+    relations:
+      type: Backbone.HasOne
+      key: 'game'
+      relatedModel: 'Game'
+      reverseRelation:
+        type: Backbone.HasMany
+        key: 'votes'
+        
+    idAttribute: 'id'
+    urlRoot: '/votes'
+      
+  class Votes extends Backbone.Collection
+    model: Vote
+    url: (models) ->
+      
+  class WantedGames extends Backbone.Collection
+    model: Game
+    url: jsRoutes.controllers.Games.index(false).url
+
+  class GameView extends Backbone.View
+    tagName: 'li'
+    
+    template: _.template($('#item-template').html())
+    
+#    events:
+#      'click .check'          : 'markOwned'
+#      'click  .vote'          : 'vote'
+    
+    initialize: ->
+      @model.bind('change', @render, @)
+      @model.bind('remove', @remove, @)
+#      @model.bind('sync', @updateCollection, @)
+      
+    render: =>
+      $(@el).html(@template(@model.toJSON()))
+      @setTitle()
+      return this
+      
+    remove: =>
+      $(@el).remove()
+      
+#    updateCollection: (model, resp, options) =>
+#      if @model.get('owned') and @model.collection instanceof WantedGamesList
+#        WantedGames.remove @model
+#        OwnedGames.add @model
+        
+    setTitle: ->
+      title = @model.get('title')
+      @$('game-text').text(title)
+      @titleSpan = @$('.game-title')
+      @titleSpan.html(title)
+      
+#    markOwned: ->
+#      @model.markOwned()
+      
+#    vote: ->
+#      @model.addVote()
+
+  class AppView extends Backbone.View
+    el: $('#gameapp')
+    
+    events:
+      'keypress #new-game'  : 'createOnEnter',
+      'keyup #new-game'     : 'showTooltip'
+      
+    initialize: =>
+      @input = @$('#new-game')
+      
+      WantedGamesList.bind('add', @addOneWanted, @)
+      WantedGamesList.bind('reset', @addAllWanted, @)
+#      WantedGamesList.bind('all', @renderWanted, @)
+      
+#      OwnedGames.bind('add', @addOneOwned, @)
+#      OwnedGames.bind('reset', @addAllOwned, @)
+#      OwnedGames.bind('all', @renderOwned, @)
+      
+      WantedGamesList.fetch()
+#      OwnedGames.fetch()
+      
+#    renderWanted: =>
+#      @$('#wanted-games').empty()
+#      for game in WantedGamesList.models
+#        do (game) =>
+#          view = new GameView({model: game})
+#          @$('#wanted-games').append(view.render().el)
+          
+#    renderOwned: =>
+#      @$('#owned-games').empty()
+#      for game in OwnedGames.models
+#        do (game) =>
+#          view = new GameView({model: game})
+#          @$('#owned-games').append(view.render().el)
+    
+    addOneWanted: (game) =>
+      view = new GameView({model: game})
+      @$('#wanted-games').append(view.render().el)
+      
+    addAllWanted: =>
+      WantedGamesList.each(@addOneWanted)
+      
+#    addOneOwned: (game) =>
+#      view = new GameView({model: game})
+#      @$('#owned-games').append(view.render().el)
+      
+#    addAllOwned: =>
+#      OwnedGames.each(@addOneOwned)
+      
+    newAttributes: ->
+      return {
+        title: @input.val(),
+        owned: false
+      }
+      
+    createOnEnter: (e) ->
+      return if (e.keyCode != 13)
+      WantedGamesList.create(@newAttributes())
+      @input.val('')
+      
+    showTooltip: (e) ->
+      tooltip = this.$('.ui-tooltip-top')
+      val = @input.val()
+      tooltip.fadeOut()
+      clearTimeout(@tooltipTimeout) if (@tooltipTimeout)
+      return if (val is '' || val is @input.attr('placeholder'))
+      
+      show = () ->
+        tooltip.show().fadeIn()
+      @tooltipTimeout = _.delay(show, 1000)
+
+  WantedGamesList = new WantedGames()
+#  OwnedGames = new OwnedGamesList()
+  App = new AppView()

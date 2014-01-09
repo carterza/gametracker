@@ -21,7 +21,7 @@ public class Global extends GlobalSettings {
                 @SuppressWarnings("unchecked")
 								Map<String,List<Object>> all = (Map<String,List<Object>>)Yaml.load("initial-data.yml");
 
-                // Insert tasks
+                // Insert games
                 Ebean.save(all.get("games"));
             }
         }
